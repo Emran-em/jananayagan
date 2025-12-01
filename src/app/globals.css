@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Monoton&family=Odibee+Sans&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap'); */
 
 :root {
   --background: #ffffff;
@@ -54,10 +54,10 @@
 }
 
 .slick-slide > div {
-  padding: 0 10px; 
+  padding: 0 10px;
 }
 .slick-list {
-  margin: 0 -10px; 
+  margin: 0 -10px;
 }
 
 .loader {
@@ -106,7 +106,7 @@
   100% {
       transform: rotate(360deg);
   }
-} 
+}
 
 .loading {
   width: 48px;
@@ -307,4 +307,4 @@
   100% {
       transform: rotate(360deg);
   }
-} 
+}

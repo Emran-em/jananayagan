@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://api.tvkcup2026.com/api/'
+const API_BASE_URL = 'https://api.tvkcup2026.com/api'
 
 export interface LoginRequest {
   email: string;
