@@ -66,8 +66,9 @@ pipeline {
                         cd ${APP_PATH} &&
                         rm -f current &&
                         ln -s releases/\${RELEASE_NAME} current &&
-                        pm2 delete ${PM2_NAME} || true &&
                         cd current &&
+                        npm install --omit=dev &&
+                        pm2 delete ${PM2_NAME} || true &&
                         pm2 start npm --name ${PM2_NAME} -- start &&
                         pm2 save
                     "
