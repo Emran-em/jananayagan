@@ -37,7 +37,7 @@ pipeline {
                 sh """
                     RELEASE_NAME=release-\$(date +%d%m-%H%M)
                     mkdir -p \${RELEASE_NAME}
-                    cp -R .next package.json package-lock.json public next.config.js \${RELEASE_NAME}/
+                    cp -R .next package.json package-lock.json public \${RELEASE_NAME}/
                     tar -czf \${RELEASE_NAME}.tar.gz \${RELEASE_NAME}
                     echo \$RELEASE_NAME > release-name.txt
                 """
@@ -47,22 +47,22 @@ pipeline {
 
         stage('Upload to Server') {
             steps {
-                echo "Uploading to server"
+                echo "Uploading build to server"
                 unstash 'artifact'
                 sh """
                     RELEASE_NAME=\$(cat release-name.txt)
-                    scp \${RELEASE_NAME}.tar.gz ${DEPLOY_USER}@${DEPLOY_HOST}:${RELEASES_DIR}/
-                    ssh ${DEPLOY_USER}@${DEPLOY_HOST} "cd ${RELEASES_DIR} && tar -xzf \${RELEASE_NAME}.tar.gz && rm -f \${RELEASE_NAME}.tar.gz"
+                    scp \${RELEASE_NAME}.tar.gz \${DEPLOY_USER}@\${DEPLOY_HOST}:${RELEASES_DIR}/
+                    ssh \${DEPLOY_USER}@\${DEPLOY_HOST} "cd ${RELEASES_DIR} && tar -xzf \${RELEASE_NAME}.tar.gz && rm -f \${RELEASE_NAME}.tar.gz"
                 """
             }
         }
 
         stage('Activate Release & Restart') {
             steps {
-                echo "Activating new release and restarting PM2"
+                echo "Switching release and restarting PM2"
                 sh """
                     RELEASE_NAME=\$(cat release-name.txt)
-                    ssh ${DEPLOY_USER}@${DEPLOY_HOST} "
+                    ssh \${DEPLOY_USER}@\${DEPLOY_HOST} "
                         cd ${APP_PATH} &&
                         rm -f current &&
                         ln -s releases/\${RELEASE_NAME} current &&
