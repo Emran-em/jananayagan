@@ -15,13 +15,14 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo "Checking out repository"
+                echo "Fetching latest code from ${GIT_BRANCH}"
                 git branch: "${GIT_BRANCH}", url: "${GIT_REPO}"
             }
         }
 
         stage('Install & Build') {
             steps {
+                echo "Installing npm dependencies and building"
                 sh """
                     rm -rf node_modules
                     npm install
@@ -33,40 +34,35 @@ pipeline {
         stage('Prepare Release') {
             steps {
                 echo "Preparing release package"
-                withCredentials([file(credentialsId: 'PROD_ENV', variable: 'PROD_ENV_FILE')]) {
-                    sh """
-                        RELEASE_NAME=release-\$(date +%d%m-%H%M)
-                        mkdir -p \${RELEASE_NAME}
-
-                        cp -R .next package.json package-lock.json public \${RELEASE_NAME}/
-                        cp \$PROD_ENV_FILE \${RELEASE_NAME}/.env.production
-
-                        tar -czf \${RELEASE_NAME}.tar.gz \${RELEASE_NAME}
-                        echo \${RELEASE_NAME} > release.txt
-                    """
-                }
-                stash includes: '*.tar.gz,release.txt', name: 'artifact'
+                sh """
+                    RELEASE_NAME=release-\$(date +%d%m-%H%M)
+                    mkdir -p \${RELEASE_NAME}
+                    cp -R .next package.json package-lock.json public next.config.js \${RELEASE_NAME}/
+                    tar -czf \${RELEASE_NAME}.tar.gz \${RELEASE_NAME}
+                    echo \$RELEASE_NAME > release-name.txt
+                """
+                stash includes: '*.tar.gz,release-name.txt', name: 'artifact'
             }
         }
 
         stage('Upload to Server') {
             steps {
+                echo "Uploading to server"
                 unstash 'artifact'
                 sh """
-                    RELEASE_NAME=\$(cat release.txt)
+                    RELEASE_NAME=\$(cat release-name.txt)
                     scp \${RELEASE_NAME}.tar.gz ${DEPLOY_USER}@${DEPLOY_HOST}:${RELEASES_DIR}/
-                    ssh ${DEPLOY_USER}@${DEPLOY_HOST} "cd ${RELEASES_DIR} && tar -xzf \${RELEASE_NAME}.tar.gz"
+                    ssh ${DEPLOY_USER}@${DEPLOY_HOST} "cd ${RELEASES_DIR} && tar -xzf \${RELEASE_NAME}.tar.gz && rm -f \${RELEASE_NAME}.tar.gz"
                 """
             }
         }
 
         stage('Activate Release & Restart') {
             steps {
+                echo "Activating new release and restarting PM2"
                 sh """
-                    RELEASE_NAME=\$(cat release.txt)
+                    RELEASE_NAME=\$(cat release-name.txt)
                     ssh ${DEPLOY_USER}@${DEPLOY_HOST} "
-                        cd ${APP_PATH}/releases/\${RELEASE_NAME} &&
-                        npm install --omit=dev &&
                         cd ${APP_PATH} &&
                         rm -f current &&
                         ln -s releases/\${RELEASE_NAME} current &&
@@ -81,7 +77,7 @@ pipeline {
     }
 
     post {
-        success { echo "Deployment completed successfully" }
-        failure { echo "Deployment failed" }
+        success { echo "Deployment Successful" }
+        failure { echo "Deployment Failed" }
     }
 }
