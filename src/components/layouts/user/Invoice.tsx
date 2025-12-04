@@ -84,7 +84,7 @@ const Invoice = () => {
                     <p className="text-[0.9rem] md:text-[1.2rem] font-light text-white">We received your order and will start preparing your package right away. You will receive a confirmation email in a moment.</p>
                 </div>
 
-                {isSuccess && data?.data?.map((item: DataProps, index: number) => (
+                {isSuccess && data?.data?.filter((item: DataProps) => item?.paymentStatus === "completed")?.map((item: DataProps, index: number) => (
                     <div key={index}>
                         <div className="flex gap-3 my-5 lg:w-[100%] lg:mx-auto py-4 px-2">
                             <div className="flex flex-col gap-2 md:flex-row flex-1">

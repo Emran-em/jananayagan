@@ -189,8 +189,8 @@ const OrderSummary = ({ address }: { address: Address }) => {
                     productId: '65a1b2c3d4e5f6789abcdef2',
                     productName: 'TVK LIMITED EDITION CUP',
                     quantity: isSuccess ? data?.buyerProfiles.length : 1,
-                    price: 299,
-                    totalPrice: isSuccess ? 299 * data?.buyerProfiles.length : 299
+                    price: 320,
+                    totalPrice: isSuccess ? 320 * data?.buyerProfiles.length : 320
                 }
             ],
             shippingAddressId: address._id,
@@ -260,7 +260,7 @@ const OrderSummary = ({ address }: { address: Address }) => {
                                 <span className='font-light text-md md:text-lg'>Subtotal</span>
                                 <div className='flex items-center font-light'>
                                     <span><AddressIcons Icon={FaIndianRupeeSign} /></span>
-                                    <span className='font-light text-md md:text-lg'>299</span>
+                                    <span className='font-light text-md md:text-lg'>320</span>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between text-sm'>
@@ -275,7 +275,7 @@ const OrderSummary = ({ address }: { address: Address }) => {
                                 <span className='font-light text-md md:text-lg'>Total</span>
                                 <div className='flex items-center font-semibold'>
                                     <span><AddressIcons Icon={FaIndianRupeeSign} /></span>
-                                    <span className='font-light text-md md:text-lg'>{isSuccess ? 299 * data?.buyerProfiles.length : 299}</span>
+                                    <span className='font-light text-md md:text-lg'>{isSuccess ? 320 * data?.buyerProfiles.length : 320}</span>
                                 </div>
                             </div>
                         </div>

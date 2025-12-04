@@ -97,11 +97,10 @@ const LoginForm = () => {
             <p className='text-sm leading-relaxed md:text-lg'>A democracy cannot thrive where power remains unchecked and justice is reserved for a select few.</p>
             <div className='hidden md:flex justify-center items-center'>
               <Image
-                src="/tvk_cup.png"
+                src="/Cup Number 277.png"
                 width={400}
                 height={300}
                 alt='jana nayagan logo'
-                className='w-[150px] h-[150px] md:w-[500px] md:h-[300px]'
               />
             </div>
             <div className='hidden md:flex flex-col'>

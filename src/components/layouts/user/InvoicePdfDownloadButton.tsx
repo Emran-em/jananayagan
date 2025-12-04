@@ -86,12 +86,12 @@ const InvoicePDF = ({ data }: {data: InvoiceProps}) => (
         <View style={{ fontSize: 14, marginRight: 40 }}>
           <Text style={{ marginBottom: 12 }}>Billed To</Text>
           <Text style={{ marginBottom: 8 }}>{data?.billedTo?.name}</Text>
-          <Text style={{ marginBottom: 8 }}>{data?.billedTo?.addressLine1} {data?.billedTo?.landmark}, {data?.billedTo?.city}, {data?.billedTo?.state}</Text>
+          <Text style={{ marginBottom: 8, flexWrap: "wrap" }}>{data?.billedTo?.addressLine1} {data?.billedTo?.landmark}, {data?.billedTo?.city}, {data?.billedTo?.state}</Text>
           <Text style={{ marginBottom: 8 }}>{data?.billedTo?.phone}</Text>
         </View>
         <View style={{ fontSize: 12, marginRight: 10 }}>
           <Text style={{ marginBottom: 12  }}>From</Text>
-          <Text style={{ marginBottom: 8 }}>TVK Cup Seller</Text>
+          <Text style={{ marginBottom: 8 }}>SUGIMX Private Limited</Text>
           <Text style={{ marginBottom: 8 }}>www.tvkcup2026.com</Text>
           <Text style={{ marginBottom: 8 }}>support@sugimx.com</Text>
         </View>

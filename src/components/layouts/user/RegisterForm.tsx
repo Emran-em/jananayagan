@@ -34,7 +34,7 @@ const RegisterForm = () => {
 
     try {
       const response = await apiService.register(data)
-      
+
       if (response.success) {
         setSuccess('Registration successful! You can now login.')
         login(response.data, response.data.token)
@@ -55,16 +55,15 @@ const RegisterForm = () => {
     <Container>
       <div>
         <div className='my-5 mx-2 lg:w-[70%] md:flex md:mx-auto md:h-[80vh] gap-8 justify-center items-center'>
-          <div className='text-center my-4 flex-2'> 
+          <div className='text-center my-4 flex-2'>
             <h1 className='text-[1.2rem] text-[#F5BB0B] font-semibold my-2 md:text-[2rem]'>Welcome, Hero of the Future</h1>
             <p className='text-sm leading-relaxed md:text-lg'>From final frame to future throne your legacy continues. One hero, one leader, rising beyond the screen into something greater.</p>
             <div className='hidden md:flex justify-center items-center'>
-              <Image 
-                src="/cup_image.png"
+              <Image
+                src="/Cup Number 277.png"
                 width={400}
                 height={300}
                 alt='jana nayagan logo'
-                className='w-[150px] h-[150px] md:w-[300px] md:h-[300px]'
               />
             </div>
             <div className='hidden md:flex flex-col'>
@@ -84,24 +83,24 @@ const RegisterForm = () => {
                   {success}
                 </div>
               )}
-              
+
               <div className='flex flex-col gap-2'>
                 <label className='text-sm text-[#F5BB0B] md:text-lg'>Name</label>
-                <input 
+                <input
                   {...register('name')}
-                  className='border-1 border-[#F5BB0B] outline-none rounded-md py-1 px-2 md:py-2' 
+                  className='border-1 border-[#F5BB0B] outline-none rounded-md py-1 px-2 md:py-2'
                   placeholder='John Doe'
                 />
                 {errors.name && (
                   <span className='text-red-500 text-sm'>{errors.name.message}</span>
                 )}
               </div>
-              
+
               <div className='flex flex-col gap-2'>
                 <label className='text-sm text-[#F5BB0B] md:text-lg'>Email</label>
-                <input 
+                <input
                   {...register('email')}
-                  className='border-1 border-[#F5BB0B] outline-none rounded-md py-1 px-2 md:py-2' 
+                  className='border-1 border-[#F5BB0B] outline-none rounded-md py-1 px-2 md:py-2'
                   type='email'
                   placeholder='johndoe@gmail.com'
                 />
@@ -109,36 +108,36 @@ const RegisterForm = () => {
                   <span className='text-red-500 text-sm'>{errors.email.message}</span>
                 )}
               </div>
-              
+
               <div className='flex flex-col gap-2'>
                 <label className='text-sm text-[#F5BB0B] md:text-lg'>Password</label>
-                <input 
+                <input
                   {...register('password')}
-                  className='border-1 border-[#F5BB0B] outline-none rounded-md py-1 px-2 md:py-2' 
-                  type='password' 
-                  placeholder='*********' 
+                  className='border-1 border-[#F5BB0B] outline-none rounded-md py-1 px-2 md:py-2'
+                  type='password'
+                  placeholder='*********'
                 />
                 {errors.password && (
                   <span className='text-red-500 text-sm'>{errors.password.message}</span>
                 )}
               </div>
-              
+
               <div className='flex flex-col gap-2'>
-                <label className='text-sm text-[#F5BB0B] md:text-lg'>Phone (Optional)</label>
-                <input 
+                <label className='text-sm text-[#F5BB0B] md:text-lg'>Phone</label>
+                <input
                   {...register('phone')}
-                  className='border-1 border-[#F5BB0B] outline-none rounded-md py-1 px-2 md:py-2' 
+                  className='border-1 border-[#F5BB0B] outline-none rounded-md py-1 px-2 md:py-2'
                   type='tel'
-                  placeholder='+1234567890' 
+                  placeholder='+1234567890'
                 />
                 {errors.phone && (
                   <span className='text-red-500 text-sm'>{errors.phone.message}</span>
                 )}
               </div>
-              
+
               <p className='text-sm md:text-md'>Do you have a account? <Link href="/login" className="underline text-[#F5BB0B]">login</Link></p>
-              
-              <button 
+
+              <button
                 type='submit'
                 disabled={isLoading}
                 className='bg-[#F5BB0B] text-black py-1 rounded-md cursor-pointer my-2 md:text-lg disabled:opacity-50 disabled:cursor-not-allowed'
@@ -146,7 +145,7 @@ const RegisterForm = () => {
                 {isLoading ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
-            
+
             <div className='flex justify-center items-center gap-2 my-2'>
               <span className='w-[100%] h-[2px] bg-gray-700'></span>
               <span className='text-gray-700'>OR</span>
