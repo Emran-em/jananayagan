@@ -61,16 +61,16 @@ pipeline {
             steps {
                 sh """
                 ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} '
-                    cd ${RELEASES_DIR}
-                    RELEASE=release-$(date +%d%m-%H%M)
-                    mkdir $RELEASE
-                    unzip app.zip -d $RELEASE
+                    cd \${RELEASES_DIR}
+                    RELEASE=release-\$(date +%d%m-%H%M)
+                    mkdir \$RELEASE
+                    unzip app.zip -d \$RELEASE
                     rm -f app.zip
-                    rm -f ${APP_PATH}/current
-                    ln -s ${RELEASES_DIR}/$RELEASE ${APP_PATH}/current
+                    rm -f \${APP_PATH}/current
+                    ln -s \${RELEASES_DIR}/\$RELEASE \${APP_PATH}/current
 
                     pm2 stop frontend || true
-                    cd ${APP_PATH}/current
+                    cd \${APP_PATH}/current
                     pm2 start "npm start" --name frontend
                     pm2 save
                 '
@@ -80,11 +80,11 @@ pipeline {
     }
 
     post {
-        failure {
-            echo "Deployment failed."
-        }
         success {
             echo "Deployment successful!"
+        }
+        failure {
+            echo "Deployment failed."
         }
     }
 }
