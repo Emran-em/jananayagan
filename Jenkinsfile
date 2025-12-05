@@ -2,18 +2,21 @@ pipeline {
     agent any
 
     environment {
-        SSH_USER = "deploy"
-        SSH_HOST = "13.126.91.50"
-        APP_DIR  = "/home/deploy/apps/jananayagan"
-        APP_NAME = "jananayagan-frontend"
+        SSH_USER     = "deploy"
+        SSH_HOST     = "13.126.91.50"
+        APP_PATH     = "/home/deploy/apps/jananayagan"
+        RELEASES_DIR = "/home/deploy/apps/jananayagan/releases"
     }
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/sugimx/jananayagan.git'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/main"]],
+                    userRemoteConfigs: [[url: "https://github.com/Emran-em/jananayagan.git"]]
+                ])
             }
         }
 
@@ -28,7 +31,9 @@ pipeline {
 
         stage('Build Next.js') {
             steps {
-                sh 'npm run build'
+                sh '''
+                    npm run build
+                '''
             }
         }
 
@@ -37,17 +42,9 @@ pipeline {
                 sh '''
                     rm -rf build
                     mkdir build
-
-                    # Create env file required by Next.js during runtime
-                    cat <<EOF > .env.production
-NEXT_PUBLIC_DOMAIN_URL=https://api.tvkcup2026.com/api
-NEXT_PUBLIC_API_BASE_URL=https://api.tvkcup2026.com/api
-AUTH_SECRET=<@TISAUTHSECRET@>
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=443405172001-sn5207gfe8nned820k77fe3265imthj3.apps.googleusercontent.com
-EOF
-
-                    cp -r .next package.json public .env.production build/
-                    cd build && zip -r app.zip .
+                    cp -r .next package.json public node_modules build/
+                    cd build
+                    zip -r app.zip .
                 '''
             }
         }
@@ -55,33 +52,39 @@ EOF
         stage('Upload to Server') {
             steps {
                 sh '''
-                    scp -o StrictHostKeyChecking=no build/app.zip ${SSH_USER}@${SSH_HOST}:${APP_DIR}/
-                    ssh ${SSH_USER}@${SSH_HOST} "cd ${APP_DIR} && rm -rf current && mkdir current && unzip app.zip -d current"
+                    scp -o StrictHostKeyChecking=no build/app.zip ${SSH_USER}@${SSH_HOST}:${RELEASES_DIR}/
                 '''
             }
         }
 
-        stage('Restart PM2') {
+        stage('Deploy & Restart') {
             steps {
-                sh '''
-                    ssh ${SSH_USER}@${SSH_HOST} "
-                        pm2 stop ${APP_NAME} || true &&
-                        pm2 delete ${APP_NAME} || true &&
-                        cd ${APP_DIR}/current &&
-                        pm2 start 'npm run start' --name ${APP_NAME} &&
-                        pm2 save
-                    "
-                '''
+                sh """
+                ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} '
+                    cd ${RELEASES_DIR}
+                    RELEASE=release-$(date +%d%m-%H%M)
+                    mkdir $RELEASE
+                    unzip app.zip -d $RELEASE
+                    rm -f app.zip
+                    rm -f ${APP_PATH}/current
+                    ln -s ${RELEASES_DIR}/$RELEASE ${APP_PATH}/current
+
+                    pm2 stop frontend || true
+                    cd ${APP_PATH}/current
+                    pm2 start "npm start" --name frontend
+                    pm2 save
+                '
+                """
             }
         }
     }
 
     post {
-        success {
-            echo "Deployment successful."
-        }
         failure {
             echo "Deployment failed."
+        }
+        success {
+            echo "Deployment successful!"
         }
     }
 }
