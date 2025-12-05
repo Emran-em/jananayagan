@@ -31,9 +31,9 @@ const prizes = [
         image: 'car2'
     },
     {
-        place: '4th – 13th Prize',
+        place: '4th – 10th Prize',
         amount: 'Bullet 350',
-        note: '10 Winners',
+        note: '7 Winners',
         accent: '#C084FC',
         glow: 'rgba(192, 132, 252, 0.5)',
         background: 'linear-gradient(135deg, rgba(192,132,252,0.15), rgba(15,4,40,0.9))',
