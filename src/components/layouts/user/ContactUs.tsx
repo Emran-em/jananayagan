@@ -93,7 +93,7 @@ const ContactUs = () => {
                         <h1 className=' bg-gradient-to-r from-[#F5BB0B] via-[#FFED9F] to-[#FF6B00] text-transparent bg-clip-text text-[1.2rem] font-semibold mb-2 text-center md:text-start md:text-[3rem]'>The Legacy Beyond the Curtain</h1>
                         <p className='text-sm md:text-lg text-[#fff]'>Forever one hero, one leader though the curtain falls, his influence only rises. In power, memory, and story, he endures, shaping the future where legends are born, live on, and inspire generations long after their final act has ended.</p>
                         <p className='text-[#F5BB0B]'>support@sugimx.com</p>
-                        <p className='text-white'>9489519652</p>
+                        {/* <p className='text-white'>9489519652</p> */}
                     </div>
                     <div className="md:flex h-100 hidden">
                         <div className='w-[2px] h-full bg-[#F5BB0B]'></div>

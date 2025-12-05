@@ -26,7 +26,7 @@ const Footer = () => {
             <div>
               <h3 className="font-semibold mb-3 text-[1rem] bg-gradient-to-r from-[#F5BB0B] via-[#FFED9F] to-[#FF6B00] text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(255,187,11,0.35)] md:text-lg xl:text-xl underline">Legal</h3>
                 <ul className="space-y-2">
-                  {/* <li><Link href="/promotional-conditions" className="hover:text-[#F5BB0B] text-sm md:text-md xl:text-lg">Promotional Lucky Draw Disclaimer</Link></li> */}
+                  <li><Link href="/promotional-conditions" className="hover:text-[#F5BB0B] text-sm md:text-md xl:text-lg">Promotional Lucky Draw Disclaimer</Link></li>
                   <li><Link href="/terms-conditions" className="hover:text-[#F5BB0B] text-sm md:text-md xl:text-lg">Terms and Conditions</Link></li>
                   <li><Link href="/privacy-policy" className="hover:text-[#F5BB0B] text-sm md:text-md xl:text-lg">Privacy Policy</Link></li>
                   <li><Link href="/shipping-policy" className="hover:text-[#F5BB0B] text-sm md:text-md xl:text-lg">Shipping & Delivery</Link></li>
