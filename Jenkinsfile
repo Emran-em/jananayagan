@@ -2,78 +2,75 @@ pipeline {
     agent any
 
     environment {
-        SSH_USER     = "deploy"
-        SSH_HOST     = "13.126.91.50"
+        GIT_REPO     = "https://github.com/sugimx/jananayagan.git"
+        GIT_BRANCH   = "main"
+        DEPLOY_USER  = "deploy"
+        DEPLOY_HOST  = "13.126.91.50"                   // Replace with your server IP
         APP_PATH     = "/home/deploy/apps/jananayagan"
         RELEASES_DIR = "/home/deploy/apps/jananayagan/releases"
+        PM2_NAME     = "frontend"
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: "*/main"]],
-                    userRemoteConfigs: [[url: "https://github.com/Emran-em/jananayagan.git"]]
-                ])
+                echo "Fetching latest code from ${GIT_BRANCH} branch"
+                git branch: "${GIT_BRANCH}", url: "${GIT_REPO}"
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Dependencies & Build') {
             steps {
-                sh '''
-                    rm -rf node_modules .next
-                    npm install --legacy-peer-deps
-                '''
-            }
-        }
-
-        stage('Build Next.js') {
-            steps {
-                sh '''
+                echo "Installing dependencies and creating production build"
+                sh """
+                    rm -rf node_modules
+                    npm install
                     npm run build
-                '''
+                """
             }
         }
 
-        stage('Prepare Artifact') {
+        stage('Prepare Release Package') {
             steps {
-                sh '''
-                    rm -rf build
-                    mkdir build
-                    cp -r .next package.json public node_modules build/
-                    cd build
-                    zip -r app.zip .
-                '''
+                echo "Packaging build for deployment"
+                sh """
+                    RELEASE_NAME=release-\$(date +%d%m-%H%M)
+                    mkdir -p \${RELEASE_NAME}
+                    cp -R .next package.json package-lock.json public \${RELEASE_NAME}/
+                    tar -czf \${RELEASE_NAME}.tar.gz \${RELEASE_NAME}
+                    echo \$RELEASE_NAME > release-name.txt
+                """
+                stash includes: '*.tar.gz,release-name.txt', name: 'artifact'
             }
         }
 
         stage('Upload to Server') {
             steps {
-                sh '''
-                    scp -o StrictHostKeyChecking=no build/app.zip ${SSH_USER}@${SSH_HOST}:${RELEASES_DIR}/
-                '''
+                echo "Uploading release to production server"
+                unstash 'artifact'
+                sh """
+                    RELEASE_NAME=\$(cat release-name.txt)
+                    scp \${RELEASE_NAME}.tar.gz \${DEPLOY_USER}@\${DEPLOY_HOST}:\${RELEASES_DIR}/
+                    ssh \${DEPLOY_USER}@\${DEPLOY_HOST} "cd \${RELEASES_DIR} && tar -xzf \${RELEASE_NAME}.tar.gz && rm -f \${RELEASE_NAME}.tar.gz"
+                """
             }
         }
 
-        stage('Deploy & Restart') {
+        stage('Activate Release & Restart Service') {
             steps {
+                echo "Switching symlink to new release and restarting PM2"
                 sh """
-                ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} '
-                    cd \${RELEASES_DIR}
-                    RELEASE=release-\$(date +%d%m-%H%M)
-                    mkdir \$RELEASE
-                    unzip app.zip -d \$RELEASE
-                    rm -f app.zip
-                    rm -f \${APP_PATH}/current
-                    ln -s \${RELEASES_DIR}/\$RELEASE \${APP_PATH}/current
-
-                    pm2 stop frontend || true
-                    cd \${APP_PATH}/current
-                    pm2 start "npm start" --name frontend
-                    pm2 save
-                '
+                    RELEASE_NAME=\$(cat release-name.txt)
+                    ssh \${DEPLOY_USER}@\${DEPLOY_HOST} "
+                        cd \${APP_PATH} &&
+                        rm -f current &&
+                        ln -s releases/\${RELEASE_NAME} current &&
+                        pm2 delete all || true &&
+                        cd current &&
+                        pm2 start npm --name \${PM2_NAME} -- start &&
+                        pm2 save
+                    "
                 """
             }
         }
@@ -81,10 +78,10 @@ pipeline {
 
     post {
         success {
-            echo "Deployment successful!"
+            echo "Deployment completed successfully."
         }
         failure {
-            echo "Deployment failed."
+            echo "Deployment failed. Check Jenkins logs."
         }
     }
 }
