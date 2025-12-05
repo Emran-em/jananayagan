@@ -5,7 +5,7 @@ pipeline {
         GIT_REPO     = "https://github.com/sugimx/jananayagan.git"
         GIT_BRANCH   = "main"
         DEPLOY_USER  = "deploy"
-        DEPLOY_HOST  = "13.126.91.50"                   // Replace with your server IP
+        DEPLOY_HOST  = "13.126.91.50"
         APP_PATH     = "/home/deploy/apps/jananayagan"
         RELEASES_DIR = "/home/deploy/apps/jananayagan/releases"
         PM2_NAME     = "frontend"
@@ -15,29 +15,29 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo "Fetching latest code from ${GIT_BRANCH} branch"
+                echo "Fetching latest code..."
                 git branch: "${GIT_BRANCH}", url: "${GIT_REPO}"
             }
         }
 
         stage('Install Dependencies & Build') {
             steps {
-                echo "Installing dependencies and creating production build"
+                echo "Installing npm packages & building application..."
                 sh """
                     rm -rf node_modules
-                    npm install
+                    npm install --legacy-peer-deps
                     npm run build
                 """
             }
         }
 
-        stage('Prepare Release Package') {
+        stage('Prepare Release') {
             steps {
-                echo "Packaging build for deployment"
+                echo "Preparing release package..."
                 sh """
                     RELEASE_NAME=release-\$(date +%d%m-%H%M)
                     mkdir -p \${RELEASE_NAME}
-                    cp -R .next package.json package-lock.json public \${RELEASE_NAME}/
+                    cp -R .next node_modules public package.json \${RELEASE_NAME}/
                     tar -czf \${RELEASE_NAME}.tar.gz \${RELEASE_NAME}
                     echo \$RELEASE_NAME > release-name.txt
                 """
@@ -45,9 +45,9 @@ pipeline {
             }
         }
 
-        stage('Upload to Server') {
+        stage('Upload & Extract on Server') {
             steps {
-                echo "Uploading release to production server"
+                echo "Uploading to server..."
                 unstash 'artifact'
                 sh """
                     RELEASE_NAME=\$(cat release-name.txt)
@@ -57,19 +57,19 @@ pipeline {
             }
         }
 
-        stage('Activate Release & Restart Service') {
+        stage('Activate & Restart PM2') {
             steps {
-                echo "Switching symlink to new release and restarting PM2"
+                echo "Activating release and restarting PM2..."
                 sh """
                     RELEASE_NAME=\$(cat release-name.txt)
                     ssh \${DEPLOY_USER}@\${DEPLOY_HOST} "
-                        cd \${APP_PATH} &&
-                        rm -f current &&
-                        ln -s releases/\${RELEASE_NAME} current &&
-                        pm2 delete all || true &&
-                        cd current &&
-                        pm2 start npm --name \${PM2_NAME} -- start &&
-                        pm2 save
+                        cd ${APP_PATH};
+                        rm -f current;
+                        ln -s releases/\${RELEASE_NAME} current;
+                        pm2 delete ${PM2_NAME} || true;
+                        cd current;
+                        pm2 start npm --name ${PM2_NAME} -- start;
+                        pm2 save;
                     "
                 """
             }
@@ -78,10 +78,10 @@ pipeline {
 
     post {
         success {
-            echo "Deployment completed successfully."
+            echo "Deployment completed successfully"
         }
         failure {
-            echo "Deployment failed. Check Jenkins logs."
+            echo "Deployment failed"
         }
     }
 }
