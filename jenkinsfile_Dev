@@ -5,7 +5,7 @@ pipeline {
         GIT_REPO     = "https://github.com/Emran-em/jananayagan.git"
         GIT_BRANCH   = "main"
         DEPLOY_USER  = "deploy"
-        DEPLOY_HOST  = "DEV_IP"
+        DEPLOY_HOST  = "3.111.218.206"
         APP_PATH     = "/home/deploy/apps/jananayagan"
         RELEASES_DIR = "/home/deploy/apps/jananayagan/releases"
         PM2_NAME     = "frontend-dev"
