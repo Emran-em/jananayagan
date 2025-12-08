@@ -86,3 +86,24 @@ resource "aws_instance" "tvk_monitor" {
     Env  = "dev"
   }
 }
+
+
+
+variable "key_name" {
+  description = "EC2 Key Pair Name"
+  type        = string
+}
+
+
+
+
+output "instance_public_ip" {
+  value = aws_instance.tvk_monitor.public_ip
+}
+
+output "instance_id" {
+  value = aws_instance.tvk_monitor.id
+}
+
+
+
